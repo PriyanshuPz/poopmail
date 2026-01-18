@@ -65,7 +65,6 @@ export default async ({ req, res, log, error }) => {
         subject: subject || '(No Subject)',
         text: text || '',
         html: html || '',
-        createdAt: new Date().toISOString(),
         expiresAt: mailbox.expiresAt,
       },
     });

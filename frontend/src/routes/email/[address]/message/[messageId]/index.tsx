@@ -1,0 +1,106 @@
+import { component$ } from "@builder.io/qwik";
+import { routeLoader$, useLocation, Link } from "@builder.io/qwik-city";
+import { appwriteConfig, Query, tablesDB } from "~/lib/appwrite";
+import { Navbar } from "~/components/core/navbar";
+import { Footer } from "~/components/core/footer";
+
+export const useMessage = routeLoader$(async (req) => {
+  const response = await tablesDB.getRow({
+    databaseId: appwriteConfig.db,
+    tableId: appwriteConfig.mails,
+    rowId: req.params.messageId,
+    queries: [
+      Query.greaterThan("expiresAt", new Date().toISOString()),
+      Query.limit(1),
+    ],
+  });
+
+  const data = response.rows[0];
+  return data;
+});
+
+export default component$(() => {
+  const loc = useLocation();
+  const message = useMessage();
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString();
+  };
+
+  return (
+    <div class="flex min-h-screen w-full flex-col">
+      <Navbar />
+      <main class="mx-auto flex max-w-4xl flex-1 flex-col p-4">
+        {loc.isNavigating && <div class="text-center">Loading...</div>}
+
+        <div class="mb-4">
+          <Link
+            href={`/email/${loc.params.address}`}
+            class="inline-block border-2 px-4 py-2 transition-colors hover:bg-[#2222]/50"
+          >
+            Back to Mailbox
+          </Link>
+        </div>
+
+        {message.value && (
+          <div class="flex flex-col space-y-4">
+            <div class="rounded border-2 bg-[#1111]/80 p-4">
+              <h1 class="mb-4 text-2xl font-bold wrap-break-word">
+                {message.value.subject || "(No Subject)"}
+              </h1>
+
+              <div class="mb-4 space-y-2 border-b-2 pb-4">
+                <div class="grid grid-cols-1 gap-2">
+                  <p class="break-all">
+                    <span class="font-semibold">From:</span>{" "}
+                    {message.value.from}
+                  </p>
+                  <p class="break-all">
+                    <span class="font-semibold">To:</span> {message.value.to}
+                  </p>
+                  <p>
+                    <span class="font-semibold">Date:</span>{" "}
+                    {formatDate(message.value.$createdAt)}
+                  </p>
+                </div>
+              </div>
+
+              <div class="border-2 bg-white p-4 text-black">
+                {message.value.html ? (
+                  <div dangerouslySetInnerHTML={message.value.html} />
+                ) : message.value.text ? (
+                  <pre class="font-sans whitespace-pre-wrap">
+                    {message.value.text}
+                  </pre>
+                ) : (
+                  <p class="opacity-70">No message content available.</p>
+                )}
+              </div>
+            </div>
+
+            <div class="rounded border-2 bg-[#1111]/80 p-4">
+              <p class="text-sm opacity-80">
+                This message will be automatically deleted when the mailbox
+                expires.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!message.value && !loc.isNavigating && (
+          <div class="rounded border-2 bg-[#1111]/80 p-4 text-center">
+            <p class="text-lg">Message not found or has expired.</p>
+            <Link
+              href={`/email/${loc.params.address}`}
+              class="mt-4 inline-block border-2 px-4 py-2 hover:bg-[#2222]/50"
+            >
+              Back to Mailbox
+            </Link>
+          </div>
+        )}
+      </main>
+      <Footer />
+    </div>
+  );
+});

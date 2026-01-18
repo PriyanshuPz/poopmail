@@ -23,7 +23,9 @@ export default {
 
 			const parser = new PostalMime.default();
 			const rawEmail = new Response(message.raw);
-			const email = await parser.parse(await rawEmail.arrayBuffer());
+			const buffer = await rawEmail.arrayBuffer();
+
+			const email = await parser.parse(buffer);
 
 			const subject = email.subject || '(No Subject)';
 			const text = email.text || '';
@@ -35,24 +37,24 @@ export default {
 				'X-Appwrite-Key': env.APPWRITE_API_KEY,
 			};
 
-			const payload = {
-				to,
-				from,
-				subject,
-				text,
-				html,
-			};
+			const qs = buildQueries([
+				{
+					method: 'equal',
+					attribute: 'address',
+					values: [to],
+				},
+				{
+					method: 'greaterThan',
+					attribute: 'expiresAt',
+					values: [new Date().toISOString()],
+				},
+				{
+					method: 'limit',
+					values: [1],
+				},
+			]);
 
-			const queries = [
-				q({ method: 'equal', column: 'address', values: [to] }),
-				q({ method: 'greaterThan', column: 'expiresAt', values: [new Date().toISOString()] }),
-				q({ method: 'limit', values: [1] }),
-			];
-
-			const url =
-				`${env.APPWRITE_ENDPOINT}/v1/tablesdb/${env.APPWRITE_DB}` +
-				`/tables/${env.APPWRITE_MAILS}/rows` +
-				`?queries[]=${queries.join('&queries[]=')}`;
+			const url = `${env.APPWRITE_ENDPOINT}/v1/tablesdb/${env.APPWRITE_DB}/tables/${env.APPWRITE_MAILS}/rows?${qs}`;
 
 			const lookup = await fetch(url, {
 				headers,
@@ -84,6 +86,7 @@ export default {
 						subject,
 						text,
 						html,
+
 						expiresAt: mailbox.expiresAt,
 					},
 				}),
@@ -98,6 +101,6 @@ export default {
 	},
 } satisfies ExportedHandler<Env>;
 
-function q(obj: unknown) {
-	return encodeURIComponent(JSON.stringify(obj));
+function buildQueries(params: any[]) {
+	return params.map((q, i) => `queries[${i}]=${encodeURIComponent(JSON.stringify(q))}`).join('&');
 }

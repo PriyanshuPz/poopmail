@@ -1,4 +1,4 @@
-import { Client, Account, Databases, TablesDB } from "appwrite";
+import { Client, Account, Databases, TablesDB , Query} from "appwrite";
 
 const client = new Client()
     .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT)
@@ -23,7 +23,7 @@ export type Mail = {
     active?: boolean;
 }
 
-export { client, account, databases, appwriteConfig,tablesDB };
+export { client, account, databases, appwriteConfig,tablesDB, Query };
 
 
 

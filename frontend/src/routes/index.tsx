@@ -170,11 +170,13 @@ export default component$(() => {
   return (
     <div class="flex min-h-screen w-full flex-col">
       <Navbar />
-      <section class="mx-auto flex min-w-xl flex-1 flex-col items-center justify-center px-4">
+      <section class="mx-auto flex flex-1 flex-col items-center justify-center px-4">
         <div class="flex w-full flex-col space-y-4">
-          <div class="flex min-w-xl flex-col rounded border-2 bg-[#1111]/80 p-4">
-            <div>
-              <h3>Your Temporary Email Address</h3>
+          <div class="flex flex-col rounded border-2 bg-[#1111]/80 p-4 sm:min-w-xl">
+            <div class="mb-4">
+              <h1 class="text-xl font-bold sm:text-2xl">
+                Your Temporary Email Address
+              </h1>
             </div>
             <Form
               onSubmit$={async (e) => {
@@ -189,22 +191,34 @@ export default component$(() => {
                   nav(`/email/${rs.value.data?.email}`);
                 }
               }}
-              class="flex h-full w-full items-start justify-center space-x-1"
+              class="flex h-full w-full flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-start"
             >
-              <div class="relative flex flex-col">
+              <div class="relative flex flex-1 flex-col">
+                <label for="username" class="sr-only">
+                  Enter username for your temporary email
+                </label>
                 <input
+                  id="username"
                   name="username"
-                  class="h-11 px-2 text-xl"
+                  class="h-11 px-3 text-base sm:text-xl"
                   type="text"
                   placeholder="Enter the username"
+                  aria-describedby="username-error"
+                  aria-invalid={
+                    !!action.value?.fieldErrors?.username ||
+                    !action.value?.success
+                  }
                 />
-                {renderError(action.value?.fieldErrors?.username)}
-                {!action.value?.success && renderError(action.value?.error)}
+                <div id="username-error" role="alert" aria-live="polite">
+                  {renderError(action.value?.fieldErrors?.username)}
+                  {!action.value?.success && renderError(action.value?.error)}
+                </div>
               </div>
 
               <button
-                class="h-12 w-14 items-center justify-center p-1"
+                class="flex h-11 w-full items-center justify-center p-1 transition-colors hover:bg-[#2222]/50 sm:h-12 sm:w-14"
                 type="submit"
+                aria-label="Create temporary mailbox"
               >
                 <LuSend font-size={20} />
               </button>
@@ -224,17 +238,22 @@ export default component$(() => {
           </div>
 
           {savedMailboxes.value.length > 0 && (
-            <div class="flex min-w-xl flex-col rounded border-2 bg-[#1111]/80 p-4">
-              <h3 class="mb-3 text-lg font-semibold">Your Active Mailboxes</h3>
+            <div class="flex flex-col rounded border-2 bg-[#1111]/80 p-4 sm:min-w-xl">
+              <h2 class="mb-3 text-lg font-semibold sm:text-xl">
+                Your Active Mailboxes
+              </h2>
               <div class="space-y-2">
                 {savedMailboxes.value.map((mailbox, index) => (
                   <Link
                     key={index}
                     href={`/email/${mailbox.address}`}
-                    class="block border-2 p-3 transition-colors hover:bg-[#2222]/50"
+                    class="block min-h-15 border-2 p-3 transition-colors hover:bg-[#2222]/50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none active:bg-[#2222]/70 sm:p-4"
+                    aria-label={`View mailbox ${mailbox.address}, expires in ${formatTimeRemaining(mailbox.expiresAt)}`}
                   >
-                    <p class="font-semibold break-all">{mailbox.address}</p>
-                    <p class="text-sm opacity-80">
+                    <p class="text-sm font-semibold break-all sm:text-base">
+                      {mailbox.address}
+                    </p>
+                    <p class="mt-1 text-xs opacity-80 sm:text-sm">
                       Expires in: {formatTimeRemaining(mailbox.expiresAt)}
                     </p>
                   </Link>

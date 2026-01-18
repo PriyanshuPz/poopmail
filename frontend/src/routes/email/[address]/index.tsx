@@ -93,12 +93,17 @@ export default component$(() => {
         {loc.isNavigating && <div class="text-center">Loading...</div>}
 
         {mailbox.value?.error && (
-          <div class="min-w-xl rounded border-2 border-red-500 bg-[#1111]/80 p-4 text-center">
-            <p class="text-lg text-red-500">Error loading mailbox</p>
-            <p class="mt-2 text-sm">{mailbox.value.error}</p>
+          <div
+            class="w-full rounded border-2 border-red-500 bg-[#1111]/80 p-4 text-center sm:p-6"
+            role="alert"
+          >
+            <p class="text-base font-semibold text-red-500 sm:text-lg">
+              Error loading mailbox
+            </p>
+            <p class="mt-2 text-sm wrap-break-word">{mailbox.value.error}</p>
             <Link
               href="/"
-              class="mt-4 inline-block border-2 px-4 py-2 hover:bg-[#2222]/50"
+              class="mt-4 inline-block min-h-11 border-2 px-4 py-2 transition-colors hover:bg-[#2222]/50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none active:bg-[#2222]/70"
             >
               Go to Home
             </Link>
@@ -106,51 +111,57 @@ export default component$(() => {
         )}
 
         {mailbox.value?.success && mailbox.value.data && (
-          <div class="flex min-w-xl flex-col space-y-4">
-            <div class="rounded border-2 bg-[#1111]/80 p-4">
-              <h1 class="mb-2 text-2xl font-bold">Mailbox</h1>
-              <div class="space-y-2">
-                <p class="text-lg break-all">
-                  <span class="font-semibold">Address:</span>{" "}
-                  {mailbox.value.data.address}
-                </p>
-                <p>
+          <div class="flex w-full flex-col space-y-4">
+            <div class="rounded border-2 bg-[#1111]/80 p-4 sm:p-6">
+              <h1 class="mb-4 text-xl font-bold sm:text-2xl">Mailbox</h1>
+              <div class="space-y-2 sm:space-y-3">
+                <div class="wrap-break-word">
+                  <span class="block text-sm font-semibold sm:inline sm:text-base">
+                    Address:
+                  </span>{" "}
+                  <span class="text-sm sm:text-lg">
+                    {mailbox.value.data.address}
+                  </span>
+                </div>
+                <p class="text-sm sm:text-base">
                   <span class="font-semibold">Expires in:</span>{" "}
                   {getTimeRemaining(mailbox.value.data.expiresAt)}
                 </p>
-                <p class="text-sm opacity-80">
+                <p class="text-xs opacity-80 sm:text-sm">
                   Expiry date: {formatDate(mailbox.value.data.expiresAt)}
                 </p>
               </div>
               <div class="mt-4 border-t-2 pt-4">
-                <p class="text-sm opacity-90">
+                <p class="text-xs opacity-90 sm:text-sm">
                   This mailbox will automatically expire in 24 hours. All
                   messages will be permanently deleted.
                 </p>
               </div>
             </div>
 
-            <div class="rounded border-2 bg-[#1111]/80 p-4">
-              <h2 class="mb-4 text-xl font-bold">Messages</h2>
+            <div class="rounded border-2 bg-[#1111]/80 p-4 sm:p-6">
+              <h2 class="mb-4 text-lg font-bold sm:text-xl">Messages</h2>
 
               {mailbox.value.data.messages &&
               mailbox.value.data.messages.length > 0 ? (
-                <div class="space-y-3">
+                <div class="space-y-3" role="list" aria-label="Email messages">
                   {mailbox.value.data.messages.map(
                     (message: any, index: number) => (
                       <Link
                         key={index}
                         href={`/email/${loc.params.address}/message/${message.$id}`}
-                        class="block border-2 p-3 no-underline transition-colors hover:bg-[#2222]/50"
+                        class="block min-h-20 border-2 p-3 no-underline transition-colors hover:bg-[#2222]/50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none active:bg-[#2222]/70 sm:p-4"
+                        role="listitem"
+                        aria-label={`Read message: ${message.subject || "No Subject"} from ${message.from}`}
                       >
                         <div class="space-y-1">
-                          <p class="text-lg font-semibold">
+                          <p class="text-base font-semibold wrap-break-word sm:text-lg">
                             {message.subject || "(No Subject)"}
                           </p>
-                          <p class="text-sm">
+                          <p class="text-xs break-all sm:text-sm">
                             <span class="opacity-80">From:</span> {message.from}
                           </p>
-                          <p class="text-sm">
+                          <p class="text-xs break-all sm:text-sm">
                             <span class="opacity-80">To:</span> {message.to}
                           </p>
                           <p class="text-xs opacity-70">
@@ -162,9 +173,9 @@ export default component$(() => {
                   )}
                 </div>
               ) : (
-                <div class="border-2 p-4 text-center opacity-70">
-                  <p>No messages yet.</p>
-                  <p class="mt-2 text-sm">
+                <div class="border-2 p-4 text-center opacity-70 sm:p-6">
+                  <p class="text-sm sm:text-base">No messages yet.</p>
+                  <p class="mt-2 text-xs wrap-break-word sm:text-sm">
                     Messages sent to {mailbox.value.data.address} will appear
                     here.
                   </p>
@@ -175,11 +186,13 @@ export default component$(() => {
         )}
 
         {mailbox.value?.success && !mailbox.value.data && !loc.isNavigating && (
-          <div class="rounded border-2 bg-[#1111]/80 p-4 text-center">
-            <p class="text-lg">Mailbox not found or has expired.</p>
+          <div class="w-full rounded border-2 bg-[#1111]/80 p-4 text-center sm:p-6">
+            <p class="text-base sm:text-lg">
+              Mailbox not found or has expired.
+            </p>
             <Link
               href="/"
-              class="mt-4 inline-block border-2 px-4 py-2 hover:bg-[#2222]/50"
+              class="mt-4 inline-block min-h-11 border-2 px-4 py-2 transition-colors hover:bg-[#2222]/50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none active:bg-[#2222]/70"
             >
               Create New Mailbox
             </Link>

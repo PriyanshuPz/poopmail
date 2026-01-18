@@ -1,4 +1,4 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useVisibleTask$ } from "@builder.io/qwik";
 import {
   routeLoader$,
   useLocation,
@@ -48,6 +48,30 @@ export default component$(() => {
   const loc = useLocation();
   const mailbox = useMailBox();
 
+  useVisibleTask$(({ track }) => {
+    track(() => mailbox.value);
+
+    if (
+      mailbox.value?.success &&
+      mailbox.value.data &&
+      typeof window !== "undefined"
+    ) {
+      const stored = localStorage.getItem("poopmail_mailboxes");
+      let mailboxes = stored ? JSON.parse(stored) : [];
+
+      const exists = mailboxes.some(
+        (m: any) => m.address === mailbox.value.data?.address,
+      );
+      if (!exists) {
+        mailboxes.push({
+          address: mailbox.value.data.address,
+          expiresAt: mailbox.value.data.expiresAt,
+        });
+        localStorage.setItem("poopmail_mailboxes", JSON.stringify(mailboxes));
+      }
+    }
+  });
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleString();
@@ -69,7 +93,7 @@ export default component$(() => {
         {loc.isNavigating && <div class="text-center">Loading...</div>}
 
         {mailbox.value?.error && (
-          <div class="rounded border-2 border-red-500 bg-[#1111]/80 p-4 text-center">
+          <div class="min-w-xl rounded border-2 border-red-500 bg-[#1111]/80 p-4 text-center">
             <p class="text-lg text-red-500">Error loading mailbox</p>
             <p class="mt-2 text-sm">{mailbox.value.error}</p>
             <Link
@@ -82,7 +106,7 @@ export default component$(() => {
         )}
 
         {mailbox.value?.success && mailbox.value.data && (
-          <div class="flex flex-col space-y-4">
+          <div class="flex min-w-xl flex-col space-y-4">
             <div class="rounded border-2 bg-[#1111]/80 p-4">
               <h1 class="mb-2 text-2xl font-bold">Mailbox</h1>
               <div class="space-y-2">
@@ -117,7 +141,7 @@ export default component$(() => {
                       <Link
                         key={index}
                         href={`/email/${loc.params.address}/message/${message.$id}`}
-                        class="block border-2 p-3 transition-colors hover:bg-[#2222]/50"
+                        class="block border-2 p-3 no-underline transition-colors hover:bg-[#2222]/50"
                       >
                         <div class="space-y-1">
                           <p class="text-lg font-semibold">
@@ -167,12 +191,15 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = {
-  title: "Poopmail",
-  meta: [
-    {
-      name: "description",
-      content: "A temp mail generator.",
-    },
-  ],
+export const head: DocumentHead = ({ resolveValue, params }) => {
+  const address = params.address;
+  return {
+    title: `Mailbox: ${address} | Poopmail`,
+    meta: [
+      {
+        name: "description",
+        content: `View messages for temporary email address ${address}. Messages automatically expire after 24 hours.`,
+      },
+    ],
+  };
 };

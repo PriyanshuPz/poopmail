@@ -67,7 +67,7 @@ export default component$(() => {
         )}
 
         {message.value?.success && message.value.data && (
-          <div class="flex flex-col space-y-4">
+          <div class="flex min-w-xl flex-col space-y-4">
             <div class="rounded border-2 bg-[#1111]/80 p-4">
               <h1 class="mb-4 text-2xl font-bold wrap-break-word">
                 {message.value.data.subject || "(No Subject)"}
@@ -129,12 +129,17 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = {
-  title: "Poopmail",
-  meta: [
-    {
-      name: "description",
-      content: "A temp mail generator.",
-    },
-  ],
+export const head: DocumentHead = ({ resolveValue, params }) => {
+  const message = resolveValue(useMessage);
+  const subject = message?.data?.subject || "Message";
+
+  return {
+    title: `${subject} | Poopmail`,
+    meta: [
+      {
+        name: "description",
+        content: `View email message in temporary mailbox. This message will be automatically deleted when the mailbox expires.`,
+      },
+    ],
+  };
 };

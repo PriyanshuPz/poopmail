@@ -1,4 +1,4 @@
-import { $, component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import { $, component$, useSignal, useTask$ } from "@builder.io/qwik";
 import {
   routeAction$,
   zod$,
@@ -115,7 +115,7 @@ export default component$(() => {
     Array<{ address: string; expiresAt: string }>
   >([]);
 
-  useVisibleTask$(() => {
+  useTask$(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("poopmail_mailboxes");
       if (stored) {
@@ -144,7 +144,7 @@ export default component$(() => {
   const saveMailboxToLocalStorage = $((address: string, expiresAt: string) => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("poopmail_mailboxes");
-      let mailboxes = stored ? JSON.parse(stored) : [];
+      const mailboxes = stored ? JSON.parse(stored) : [];
 
       // Check if mailbox already exists
       const exists = mailboxes.some((m: any) => m.address === address);

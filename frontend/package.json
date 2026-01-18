@@ -1,5 +1,5 @@
 {
-  "name": "my-qwik-empty-starter",
+  "name": "@poopmail/web",
   "description": "Blank project with routing included",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"

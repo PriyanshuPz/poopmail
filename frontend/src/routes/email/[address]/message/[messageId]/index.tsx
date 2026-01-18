@@ -129,7 +129,7 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = ({ resolveValue, params }) => {
+export const head: DocumentHead = ({ resolveValue }) => {
   const message = resolveValue(useMessage);
   const subject = message?.data?.subject || "Message";
 

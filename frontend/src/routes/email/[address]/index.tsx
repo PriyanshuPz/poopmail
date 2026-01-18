@@ -1,4 +1,4 @@
-import { component$, useVisibleTask$ } from "@builder.io/qwik";
+import { component$, useTask$ } from "@builder.io/qwik";
 import {
   routeLoader$,
   useLocation,
@@ -48,7 +48,7 @@ export default component$(() => {
   const loc = useLocation();
   const mailbox = useMailBox();
 
-  useVisibleTask$(({ track }) => {
+  useTask$(({ track }) => {
     track(() => mailbox.value);
 
     if (
@@ -57,7 +57,7 @@ export default component$(() => {
       typeof window !== "undefined"
     ) {
       const stored = localStorage.getItem("poopmail_mailboxes");
-      let mailboxes = stored ? JSON.parse(stored) : [];
+      const mailboxes = stored ? JSON.parse(stored) : [];
 
       const exists = mailboxes.some(
         (m: any) => m.address === mailbox.value.data?.address,
@@ -191,7 +191,7 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = ({ resolveValue, params }) => {
+export const head: DocumentHead = ({ params }) => {
   const address = params.address;
   return {
     title: `Mailbox: ${address} | Poopmail`,

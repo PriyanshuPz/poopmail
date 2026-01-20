@@ -114,6 +114,7 @@ export default component$(() => {
   const savedMailboxes = useSignal<
     Array<{ address: string; expiresAt: string }>
   >([]);
+  const isLoadingMailboxes = useSignal(true);
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
@@ -137,6 +138,7 @@ export default component$(() => {
           localStorage.removeItem("poopmail_mailboxes");
         }
       }
+      isLoadingMailboxes.value = false;
     }
   });
 
@@ -202,12 +204,13 @@ export default component$(() => {
                   name="username"
                   class="h-11 px-3 text-base sm:text-xl"
                   type="text"
-                  placeholder="Enter the username"
+                  placeholder="Enter the username (keep empty to auto gen)"
                   aria-describedby="username-error"
                   aria-invalid={
                     !!action.value?.fieldErrors?.username ||
                     !action.value?.success
                   }
+                  disabled={action.isRunning}
                 />
                 <div id="username-error" role="alert" aria-live="polite">
                   {renderError(action.value?.fieldErrors?.username)}
@@ -216,11 +219,16 @@ export default component$(() => {
               </div>
 
               <button
-                class="flex h-11 w-full items-center justify-center p-1 transition-colors hover:bg-[#2222]/50 sm:h-12 sm:w-14"
+                class="flex h-11 w-full items-center justify-center p-1 transition-colors hover:bg-[#2222]/50 disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:w-14"
                 type="submit"
                 aria-label="Create temporary mailbox"
+                disabled={action.isRunning}
               >
-                <LuSend font-size={20} />
+                {action.isRunning ? (
+                  <div class="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <LuSend font-size={20} />
+                )}
               </button>
             </Form>
             <div>
@@ -237,7 +245,22 @@ export default component$(() => {
             </div>
           </div>
 
-          {savedMailboxes.value.length > 0 && (
+          {isLoadingMailboxes.value ? (
+            <div class="flex flex-col rounded border-2 bg-[#1111] p-4 sm:min-w-xl">
+              <div class="mb-3 h-7 w-48 animate-pulse rounded bg-white/70" />
+              <div class="space-y-2">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    class="block min-h-15 animate-pulse border-2 border-white/70 p-3 sm:p-4"
+                  >
+                    <div class="h-5 w-3/4 rounded bg-white/70" />
+                    <div class="mt-2 h-4 w-1/2 rounded bg-white/70" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : savedMailboxes.value.length > 0 ? (
             <div class="flex flex-col rounded border-2 bg-[#1111]/80 p-4 sm:min-w-xl">
               <h2 class="mb-3 text-lg font-semibold sm:text-xl">
                 Your Active Mailboxes
@@ -260,7 +283,7 @@ export default component$(() => {
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </section>
 

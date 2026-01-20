@@ -44,14 +44,26 @@ export default component$(() => {
       <main class="mx-auto flex max-w-4xl flex-1 flex-col p-4">
         {loc.isNavigating && <div class="text-center">Loading...</div>}
 
-        <nav class="mb-4" aria-label="Breadcrumb">
+        <nav
+          class="mb-4 flex items-center space-x-2 text-sm sm:text-base"
+          aria-label="Breadcrumb"
+        >
+          <Link
+            href="/"
+            class="transition-colors hover:text-white/80 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+          >
+            Home
+          </Link>
+          <span class="opacity-50">/</span>
           <Link
             href={`/email/${loc.params.address}`}
-            class="inline-flex min-h-11 items-center border-2 px-4 py-2 transition-colors hover:bg-[#2222]/50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none active:bg-[#2222]/70"
-            aria-label="Back to mailbox"
+            class="max-w-50 truncate transition-colors hover:text-white/80 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none sm:max-w-xs"
+            title={loc.params.address}
           >
-            ← Back to Mailbox
+            {loc.params.address}
           </Link>
+          <span class="opacity-50">/</span>
+          <span class="opacity-80">Message</span>
         </nav>
 
         {message.value?.error && (

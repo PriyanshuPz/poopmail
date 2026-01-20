@@ -90,6 +90,20 @@ export default component$(() => {
     <div class="flex min-h-screen w-full flex-col">
       <Navbar />
       <main class="mx-auto flex max-w-4xl flex-1 flex-col p-4">
+        <nav
+          class="mb-4 flex items-center space-x-2 text-sm sm:text-base"
+          aria-label="Breadcrumb"
+        >
+          <Link
+            href="/"
+            class="transition-colors hover:text-white/80 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:outline-none"
+          >
+            Home
+          </Link>
+          <span class="opacity-50">/</span>
+          <span class="opacity-80">Mailbox</span>
+        </nav>
+
         {loc.isNavigating && <div class="text-center">Loading...</div>}
 
         {mailbox.value?.error && (

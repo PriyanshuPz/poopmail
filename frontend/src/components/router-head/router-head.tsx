@@ -12,7 +12,7 @@ export const RouterHead = component$(() => {
   const description =
     head.meta.find((m) => m.name === "description")?.content ||
     "Create instant temporary email addresses. No registration required. Emails auto-delete after 24 hours.";
-  const ogImageUrl = `${loc.url.origin}/banner.png`;
+  const ogImageUrl = `${loc.url.origin}/og.png`;
 
   return (
     <>

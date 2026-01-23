@@ -2,7 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import moment from "moment";
 
 const buildTime = import.meta.env.PUBLIC_BUILD_TIME || new Date().toISOString();
-const commitHash = import.meta.env.VERCEL_GIT_COMMIT_SHA || "unknown";
+const commitHash = import.meta.env.PUBLIC_COMMIT_HASH || "unknown";
 
 export const Footer = component$(() => {
   const timeAgo = moment(buildTime).fromNow();

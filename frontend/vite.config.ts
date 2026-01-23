@@ -8,7 +8,6 @@ import { qwikCity } from "@builder.io/qwik-city/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import pkg from "./package.json";
 import tailwindcss from "@tailwindcss/vite";
-import { execSync } from "child_process";
 
 type PkgDep = Record<string, string>;
 const { dependencies = {}, devDependencies = {} } = pkg as any as {
@@ -17,16 +16,48 @@ const { dependencies = {}, devDependencies = {} } = pkg as any as {
   [key: string]: unknown;
 };
 errorOnDuplicatesPkgDeps(devDependencies, dependencies);
+
+let cachedCommitHash: string | null = null;
+
+async function getLatestCommitHash(): Promise<string> {
+  if (cachedCommitHash) {
+    return cachedCommitHash;
+  }
+
+  try {
+    const response = await fetch(
+      "https://api.github.com/repos/PriyanshuPz/poopmail/commits/master",
+      {
+        headers: {
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    cachedCommitHash = data.sha;
+    return cachedCommitHash || 'master';
+  } catch (error) {
+    console.error("Failed to fetch commit hash from GitHub:", error);
+    return "unknown";
+  }
+}
+
 /**
  * Note that Vite normally starts from `index.html` but the qwikCity plugin makes start at `src/entry.ssr.tsx` instead.
  */
 
-export default defineConfig(({ command, mode }): UserConfig => {
- 
+export default defineConfig(async ({ command, mode }): Promise<UserConfig> => {
+  const commitHash = await getLatestCommitHash();
   const buildTime = new Date().toISOString();
 
   return {
     define: {
+      "import.meta.env.PUBLIC_COMMIT_HASH": JSON.stringify(commitHash),
       "import.meta.env.PUBLIC_BUILD_TIME": JSON.stringify(buildTime),
     },
     plugins: [

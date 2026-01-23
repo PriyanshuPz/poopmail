@@ -14,7 +14,7 @@ export default component$(() => {
             <h1 class="mb-4 text-3xl font-bold">Terms and Conditions</h1>
 
             <div class="space-y-4">
-              <p class="text-sm opacity-90">Last updated: January 18, 2026</p>
+              <p class="text-sm opacity-90">Last updated: January 23, 2026</p>
 
               <div class="mt-6 border-t-2 pt-4">
                 <h2 class="mb-3 text-xl font-semibold">

@@ -39,12 +39,20 @@ export default component$(() => {
 
               <div class="mt-6 border-t-2 pt-4">
                 <h2 class="mb-3 text-xl font-semibold">
-                  3. No Data Collection
+                  3. Privacy and Analytics
                 </h2>
                 <p>
                   We do not collect, store, or track any personal information
                   about our users. We do not use cookies for tracking purposes.
                   Your privacy is paramount.
+                </p>
+                <p class="mt-3">
+                  We use Vercel Analytics for fair use monitoring only. This
+                  helps us implement rate limiting to ensure service quality and
+                  detect/report abuse or malicious activity. Analytics data is
+                  minimal, anonymized, and used solely to maintain service
+                  stability and prevent misuse. No personal information is
+                  collected through analytics.
                 </p>
               </div>
 
